@@ -23,6 +23,20 @@ Hermes must always start by reading these files in this order:
 2. `TASKS/ACTIVE_TASK.md`
 3. The task file referenced inside `TASKS/ACTIVE_TASK.md`
 
+## Minimal app run instructions
+
+Install dependencies and run the proof-of-concept app:
+
+```bash
+npm install
+npm start
+```
+
+The server exposes:
+
+- `GET /health` → `{ "status": "ok" }`
+- `GET /api/todos` → a sample todo list
+
 ## Expected Hermes loop
 
 ```text
