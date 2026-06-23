@@ -37,6 +37,45 @@ The server exposes:
 - `GET /health` → `{ "status": "ok" }`
 - `GET /api/todos` → a sample todo list
 
+## Task polling worker
+
+The Phase 2 POC adds a lightweight GitHub Issues poller for PM-to-Hermes work intake.
+
+### Labels
+
+Use these labels on GitHub issues:
+
+- `pm:ready`
+- `hermes:ready`
+
+### Poll manually
+
+```bash
+npm run poll:tasks
+```
+
+To claim the next runnable task and update `.hermes/state.json` atomically:
+
+```bash
+npm run poll:tasks -- --claim
+```
+
+### Cron example
+
+Run every 60 seconds:
+
+```cron
+* * * * * cd /path/to/hermes-ai-flow-poc && /usr/bin/npm run poll:tasks -- --claim >> LOGS/task-poller-cron.log 2>&1
+```
+
+### Systemd timer example
+
+- Service: `hermes-task-poller.service`
+- Timer: `hermes-task-poller.timer`
+- Execute `npm run poll:tasks -- --claim` on schedule
+
+The worker skips tasks already recorded in `.hermes/state.json` to prevent duplicate execution.
+
 ## Expected Hermes loop
 
 ```text

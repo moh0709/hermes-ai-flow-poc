@@ -1,0 +1,63 @@
+== npm test ==
+
+> hermes-ai-flow-poc@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.6 /root/.hermes/projects/hermes-ai-flow-poc
+
+ ✓ tests/task-queue.test.js (5 tests) 10ms
+ ✓ tests/app.test.js (2 tests) 63ms
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  19:59:13
+   Duration  2.71s (transform 138ms, setup 0ms, collect 1.94s, tests 73ms, environment 1ms, prepare 538ms)
+
+== npm run lint ==
+
+> hermes-ai-flow-poc@1.0.0 lint
+> eslint src tests scripts
+
+== poller dry run ==
+
+> hermes-ai-flow-poc@1.0.0 poll:tasks
+> node scripts/task-poller.mjs --json
+
+{
+  "found": true,
+  "action": "claimable",
+  "repo": "moh0709/hermes-ai-flow-poc",
+  "task_id": "TASK-002",
+  "issue": {
+    "number": 1,
+    "title": "TASK-002: Build GitHub Issues polling worker and task queue",
+    "url": "https://github.com/moh0709/hermes-ai-flow-poc/issues/1",
+    "labels": [
+      "pm:ready",
+      "hermes:ready"
+    ]
+  },
+  "state": {
+    "current_task_id": "TASK-001",
+    "status": "COMPLETED",
+    "last_started_at": "2026-06-23T19:01:00Z",
+    "last_completed_at": "2026-06-23T19:06:00Z",
+    "last_commit": "4ce445be552432a68a2b114359bba72561bbf6cc",
+    "last_report": "REPORTS/TASK-001-RESULT.md",
+    "task_queue": {
+      "source": "github-issues",
+      "labels": [
+        "pm:ready",
+        "hermes:ready"
+      ],
+      "poll_interval_seconds": 60,
+      "last_polled_at": null,
+      "current_issue_number": null,
+      "current_issue_url": null
+    },
+    "notes": "TASK-001 completed successfully: Express app, tests, lint, logs, report, commit, and push completed. TASK-002 adds GitHub Issues polling with duplicate-prevention state."
+  }
+}
+
+__HERMES_CWD_8e9089d197c8__/root/.hermes/projects/hermes-ai-flow-poc__HERMES_CWD_8e9089d197c8__

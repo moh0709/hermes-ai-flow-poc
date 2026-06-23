@@ -1,13 +1,14 @@
 {
   "name": "hermes-ai-flow-poc",
   "version": "1.0.0",
-  "description": "Minimal Express app for the Hermes AI flow proof of concept.",
+  "description": "Minimal Express app and GitHub Issues polling POC for the Hermes AI flow.",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
+    "poll:tasks": "node scripts/task-poller.mjs",
     "test": "vitest run",
-    "lint": "eslint src tests"
+    "lint": "eslint src tests scripts"
   },
   "dependencies": {
     "express": "^4.21.2"

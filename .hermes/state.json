@@ -5,5 +5,16 @@
   "last_completed_at": "2026-06-23T19:06:00Z",
   "last_commit": "4ce445be552432a68a2b114359bba72561bbf6cc",
   "last_report": "REPORTS/TASK-001-RESULT.md",
-  "notes": "TASK-001 completed successfully: Express app, tests, lint, logs, report, commit, and push completed."
+  "task_queue": {
+    "source": "github-issues",
+    "labels": [
+      "pm:ready",
+      "hermes:ready"
+    ],
+    "poll_interval_seconds": 60,
+    "last_polled_at": null,
+    "current_issue_number": null,
+    "current_issue_url": null
+  },
+  "notes": "TASK-001 completed successfully: Express app, tests, lint, logs, report, commit, and push completed. TASK-002 adds GitHub Issues polling with duplicate-prevention state."
 }
