@@ -37,53 +37,6 @@ Create these files where practical:
 - skills/hermes-pm-framework.skill.md
 - skills/hermes-pm-framework.prompt.json
 
-## Main README Update
-Update README.md so the repo is presented as a reusable framework, not only a POC.
-
-README should explain:
-
-- what the framework is,
-- when to use it,
-- architecture flow,
-- roles,
-- quick start,
-- setup steps,
-- validation process,
-- how to reuse it for EverythingAI or another app.
-
-## Setup Guide Requirements
-The setup guide must include step-by-step instructions for a new project:
-
-1. Choose GitHub repo.
-2. Clone repo on VPS.
-3. Ensure Hermes and GitHub CLI access are available.
-4. Add framework files.
-5. Create labels: pm:ready, hermes:ready, hermes:working, hermes:blocked, hermes:done, pm:review.
-6. Add .hermes/state.json.
-7. Test with npm run worker:once.
-8. Run continuously with npm run worker:watch or scheduled worker.
-9. Create test issue.
-10. Verify logs, reports, commit, and issue comment.
-
-## Global Skill Requirements
-Create a reusable skill document for ChatGPT that includes:
-
-- purpose,
-- roles,
-- operating rules,
-- task creation format,
-- acceptance criteria format,
-- review checklist,
-- blocker handling,
-- when to create issues,
-- when to wait,
-- when to inspect logs and reports.
-
-Also create a JSON prompt for bootstrapping Hermes in a new repository.
-
-## Keep POC Evidence
-Do not remove TASK-001 to TASK-005 evidence. It is useful proof history.
-
 ## Validation Commands
 Run:
 
@@ -92,25 +45,67 @@ npm run lint
 
 Also check that JSON files are valid.
 
-## Deliverables
-- Updated README.md
-- New docs folder
-- New templates folder
-- New skills folder
-- Updated .hermes/state.json
-- LOGS/TASK-006-terminal.log
-- REPORTS/TASK-006-RESULT.md
-- Completion comment on this issue with status, validation result, report path, log path, and commit hash.
+---
 
-## Acceptance Criteria
-- A new developer can reuse this setup from the documentation.
-- Roles are clear.
-- GitHub Issues workflow is clear.
-- Hermes worker setup is clear.
-- The skill package is reusable in other projects.
-- EverythingAI adoption plan is included.
-- Tests pass.
-- Lint passes.
+$ npm run worker:once -- --json
+{
+  "found": true,
+  "action": "failed",
+  "repo": "moh0709/hermes-ai-flow-poc",
+  "task_id": "TASK-006",
+  "issue": {
+    "number": 5,
+    "title": "TASK-006: Convert POC into reusable Hermes PM framework",
+    "url": "https://github.com/moh0709/hermes-ai-flow-poc/issues/5",
+    "labels": [
+      "pm:ready",
+      "hermes:ready"
+    ]
+  },
+  "validation": [],
+  "report": "/root/.hermes/projects/hermes-ai-flow-poc/REPORTS/TASK-006-RESULT.md",
+  "commit": "422636bc636941123e8a0b06ee5d8f3eff402940",
+  "execution": {
+    "dryRun": false,
+    "logPath": "/root/.hermes/projects/hermes-ai-flow-poc/LOGS/TASK-006-terminal.log"
+  },
+  "state": {
+    "current_task_id": "TASK-006",
+    "status": "FAILED",
+    "last_started_at": "2026-06-23T22:14:35.435Z",
+    "last_completed_at": "2026-06-23T22:12:35.306Z",
+    "last_failed_at": "2026-06-23T22:14:35.526Z",
+    "last_claimed_at": "2026-06-23T22:14:35.417Z",
+    "last_commit": "422636bc636941123e8a0b06ee5d8f3eff402940",
+    "last_report": "REPORTS/TASK-004-RESULT.md",
+    "last_validation": [],
+    "last_completed_task_id": "TASK-004",
+    "last_failed_task_id": "TASK-006"
+  }
+}
 
-## PM Note
-This task is approved by Mohammad and ChatGPT. The objective is to finalize the POC into a reusable global AI teamwork framework.
+$ npm test
+
+> hermes-ai-flow-poc@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.6 /root/.hermes/projects/hermes-ai-flow-poc
+
+ ✓ tests/task-worker.test.js (5 tests) 22ms
+ ✓ tests/task-queue.test.js (5 tests) 12ms
+ ✓ tests/app.test.js (2 tests) 64ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  00:15:30
+   Duration  1.05s (transform 124ms, setup 0ms, collect 527ms, tests 98ms, environment 1ms, prepare 482ms)
+
+$ npm run lint
+
+> hermes-ai-flow-poc@1.0.0 lint
+> eslint src tests scripts
+
+$ node -e "const fs=require('fs'); for (const f of ['templates/STATE_TEMPLATE.json','skills/hermes-pm-framework.prompt.json']) { JSON.parse(fs.readFileSync(f,'utf8')); console.log(f+': ok'); }"
+templates/STATE_TEMPLATE.json: ok
+skills/hermes-pm-framework.prompt.json: ok

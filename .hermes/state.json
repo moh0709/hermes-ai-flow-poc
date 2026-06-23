@@ -1,15 +1,28 @@
 {
-  "current_task_id": "TASK-002",
-  "status": "FAILED",
-  "last_started_at": "2026-06-23T22:07:09.139Z",
-  "last_completed_at": "2026-06-23T22:05:36.000Z",
-  "last_failed_at": "2026-06-23T22:07:09.174Z",
-  "last_claimed_at": "2026-06-23T22:07:09.129Z",
-  "last_commit": "d4a8dcb1f761eb832c0070f917bf32f613ef1463",
-  "last_report": "REPORTS/TASK-005-RESULT.md",
-  "last_validation": [],
-  "last_completed_task_id": "TASK-005",
-  "last_failed_task_id": "TASK-002",
+  "current_task_id": "TASK-006",
+  "status": "COMPLETED",
+  "last_started_at": "2026-06-23T22:14:35.435Z",
+  "last_completed_at": "2026-06-23T22:16:47Z",
+  "last_failed_at": "2026-06-23T22:14:35.526Z",
+  "last_claimed_at": "2026-06-23T22:14:35.417Z",
+  "last_commit": "422636bc636941123e8a0b06ee5d8f3eff402940",
+  "last_report": "REPORTS/TASK-006-RESULT.md",
+  "last_validation": [
+    {
+      "command": "npm test",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0
+    },
+    {
+      "command": "node -e \"const fs=require('fs'); for (const f of ['templates/STATE_TEMPLATE.json','skills/hermes-pm-framework.prompt.json']) { JSON.parse(fs.readFileSync(f,'utf8')); console.log(f+': ok'); }\"",
+      "exitCode": 0
+    }
+  ],
+  "last_completed_task_id": "TASK-006",
+  "last_failed_task_id": "TASK-006",
   "task_queue": {
     "source": "github-issues",
     "labels": [
@@ -17,20 +30,15 @@
       "hermes:ready"
     ],
     "poll_interval_seconds": 60,
-    "last_polled_at": "2026-06-23T22:07:09.174Z",
-    "last_claimed_at": "2026-06-23T22:07:09.129Z",
-    "last_started_at": "2026-06-23T22:07:09.139Z",
-    "last_completed_at": "2026-06-23T22:05:36.000Z",
-    "last_failed_at": "2026-06-23T22:07:09.174Z",
-    "current_task_id": "TASK-002",
-    "current_issue_number": 1,
-    "current_issue_url": "https://github.com/moh0709/hermes-ai-flow-poc/issues/1",
-    "current_issue_title": "TASK-002: Build GitHub Issues polling worker and task queue",
-    "current_issue_body": "## Mission\nBuild the minimal autonomous task-discovery layer for Hermes AI using GitHub Issues polling. This is the POC step for proving that Hermes can find new tasks from ChatGPT/PM and execute them autonomously.\n\n## Objectives\n1. Implement a lightweight poller that checks GitHub Issues every 60 seconds.\n2. Detect tasks by labels: `pm:ready` and `hermes:ready`.\n3. Prevent duplicate execution using `.hermes/state.json`.\n4. Track task lifecycle states and write logs/reports consistently.\n5. Keep the solution simple and resource-efficient for the POC.\n\n## Acceptance Criteria\n- Poller can discover ready issues from GitHub.\n- Poller ignores already completed tasks.\n- A task lock/state mechanism prevents concurrent duplicate runs.\n- Execution writes terminal logs and result reports in the repo.\n- The system is documented well enough for Phase 2 follow-up work.\n\n## Notes for Hermes\n- Prefer the simplest reliable implementation.\n- Do not introduce webhook infrastructure yet.\n- If needed, add small helper scripts and/or a cron job entry.\n- Keep all changes compatible with the current POC repository structure.",
-    "status": "FAILED"
-  },
-  "current_issue_number": 1,
-  "current_issue_url": "https://github.com/moh0709/hermes-ai-flow-poc/issues/1",
-  "current_issue_title": "TASK-002: Build GitHub Issues polling worker and task queue",
-  "current_issue_body": "## Mission\nBuild the minimal autonomous task-discovery layer for Hermes AI using GitHub Issues polling. This is the POC step for proving that Hermes can find new tasks from ChatGPT/PM and execute them autonomously.\n\n## Objectives\n1. Implement a lightweight poller that checks GitHub Issues every 60 seconds.\n2. Detect tasks by labels: `pm:ready` and `hermes:ready`.\n3. Prevent duplicate execution using `.hermes/state.json`.\n4. Track task lifecycle states and write logs/reports consistently.\n5. Keep the solution simple and resource-efficient for the POC.\n\n## Acceptance Criteria\n- Poller can discover ready issues from GitHub.\n- Poller ignores already completed tasks.\n- A task lock/state mechanism prevents concurrent duplicate runs.\n- Execution writes terminal logs and result reports in the repo.\n- The system is documented well enough for Phase 2 follow-up work.\n\n## Notes for Hermes\n- Prefer the simplest reliable implementation.\n- Do not introduce webhook infrastructure yet.\n- If needed, add small helper scripts and/or a cron job entry.\n- Keep all changes compatible with the current POC repository structure."
+    "last_polled_at": "2026-06-23T22:14:35.526Z",
+    "last_claimed_at": "2026-06-23T22:14:35.417Z",
+    "last_started_at": "2026-06-23T22:14:35.435Z",
+    "last_completed_at": "2026-06-23T22:16:47Z",
+    "last_failed_at": "2026-06-23T22:14:35.526Z",
+    "current_task_id": "TASK-006",
+    "current_issue_number": 5,
+    "current_issue_url": "https://github.com/moh0709/hermes-ai-flow-poc/issues/5",
+    "current_issue_title": "TASK-006: Convert POC into reusable Hermes PM framework",
+    "status": "COMPLETED"
+  }
 }
