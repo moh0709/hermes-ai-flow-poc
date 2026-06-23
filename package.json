@@ -1,7 +1,7 @@
 {
   "name": "hermes-ai-flow-poc",
   "version": "1.0.0",
-  "description": "Minimal Express app and GitHub Issues polling POC for the Hermes AI flow.",
+  "description": "Reusable Hermes PM framework for GitHub Issues based autonomous execution.",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "poll:tasks": "node scripts/task-poller.mjs",
     "worker:once": "node scripts/task-worker.mjs --once",
     "worker:watch": "node scripts/task-worker.mjs --watch",
+    "framework:doctor": "node scripts/framework-doctor.mjs",
     "test": "vitest run",
     "lint": "eslint src tests scripts"
   },
