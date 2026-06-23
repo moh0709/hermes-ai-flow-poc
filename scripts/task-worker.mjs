@@ -197,10 +197,48 @@ async function commentOnIssue(repo, issueNumber, body) {
   });
 }
 
-async function closeIssue(repo, issueNumber) {
-  await execFileAsync('gh', ['issue', 'close', '-R', repo, String(issueNumber)], {
-    cwd: repoRoot,
-    maxBuffer: 1024 * 1024,
+async function updateIssueLabels(repo, issueNumber, { add = [], remove = [] } = {}) {
+  const args = ['issue', 'edit', '-R', repo, String(issueNumber)];
+
+  for (const label of add) {
+    args.push('--add-label', label);
+  }
+  for (const label of remove) {
+    args.push('--remove-label', label);
+  }
+
+  if (args.length === 5) {
+    return;
+  }
+
+  try {
+    await execFileAsync('gh', args, {
+      cwd: repoRoot,
+      maxBuffer: 1024 * 1024,
+    });
+  } catch (error) {
+    console.warn(`Issue label update skipped for #${issueNumber}: ${error?.message ?? error}`);
+  }
+}
+
+async function markIssueClaimed(repo, issueNumber) {
+  await updateIssueLabels(repo, issueNumber, {
+    add: ['hermes:working'],
+    remove: ['hermes:ready'],
+  });
+}
+
+async function markIssueCompleted(repo, issueNumber) {
+  await updateIssueLabels(repo, issueNumber, {
+    add: ['hermes:done', 'pm:review'],
+    remove: ['pm:ready', 'hermes:ready', 'hermes:working', 'hermes:blocked'],
+  });
+}
+
+async function markIssueFailed(repo, issueNumber) {
+  await updateIssueLabels(repo, issueNumber, {
+    add: ['hermes:blocked', 'pm:review'],
+    remove: ['pm:ready', 'hermes:ready', 'hermes:working', 'hermes:done'],
   });
 }
 
@@ -210,6 +248,33 @@ async function getCommitHash() {
     maxBuffer: 1024 * 1024,
   });
   return stdout.trim();
+}
+
+function validationSummary(validation) {
+  if (!validation?.results?.length) {
+    return 'No validation commands were executed.';
+  }
+
+  return validation.results
+    .map((result) => `- ${result.command}: ${result.exitCode === 0 ? 'PASS' : 'FAIL'}`)
+    .join('\n');
+}
+
+function buildFinalIssueComment({ taskId, validationPassed, reportPath, logPath, commit, validation }) {
+  const status = validationPassed ? 'COMPLETED' : 'FAILED';
+  return [
+    `<!-- hermes-final:${taskId} -->`,
+    `## Hermes result: ${taskId}`,
+    '',
+    `Status: ${status}`,
+    `Validation: ${validationPassed ? 'PASS' : 'FAIL'}`,
+    `Report: \`${reportPath}\``,
+    `Log: \`${logPath}\``,
+    `Commit: \`${commit}\``,
+    '',
+    '### Validation commands',
+    validationSummary(validation),
+  ].join('\n');
 }
 
 async function executeTask({ repo, issue, state, dryRun }) {
@@ -231,6 +296,7 @@ async function executeTask({ repo, issue, state, dryRun }) {
   }
 
   await saveJson(stateFile, claimedState);
+  await markIssueClaimed(repo, issue.number);
 
   const inProgressState = startTaskExecution(claimedState);
   await saveJson(stateFile, inProgressState);
@@ -271,10 +337,12 @@ async function executeTask({ repo, issue, state, dryRun }) {
     executionLog,
   });
   const { logPath, reportPath } = await writeTaskArtifacts(taskId, executionLog, reportContent);
+  const relativeLogPath = path.relative(repoRoot, logPath);
+  const relativeReportPath = path.relative(repoRoot, reportPath);
   const completedState = validationPassed
     ? completeTaskExecution(executionState, {
         commit,
-        report: path.relative(repoRoot, reportPath),
+        report: relativeReportPath,
         validation: validation.results,
       })
     : failTaskExecution(executionState, {
@@ -283,24 +351,23 @@ async function executeTask({ repo, issue, state, dryRun }) {
       });
   await saveJson(stateFile, completedState);
 
-  const validationStatus = validationPassed ? 'PASS' : 'FAIL';
   try {
-    await commentOnIssue(
-      repo,
-      issue.number,
-      [
-        'TASK ' + taskId + (validationPassed ? ' completed.' : ' failed.'),
-        'Report: `' + path.relative(repoRoot, reportPath) + '`',
-        'Log: `' + path.relative(repoRoot, logPath) + '`',
-        'Validation: ' + validationStatus,
-        'Commit: `' + commit + '`',
-      ].join('\n')
-    );
+    const finalComment = buildFinalIssueComment({
+      taskId,
+      validationPassed,
+      reportPath: relativeReportPath,
+      logPath: relativeLogPath,
+      commit,
+      validation,
+    });
+    await commentOnIssue(repo, issue.number, finalComment);
     if (validationPassed) {
-      await closeIssue(repo, issue.number);
+      await markIssueCompleted(repo, issue.number);
+    } else {
+      await markIssueFailed(repo, issue.number);
     }
   } catch (commentError) {
-    console.error(`Issue comment failed for ${taskId}: ${commentError?.message ?? commentError}`);
+    console.error(`Issue reporting failed for ${taskId}: ${commentError?.message ?? commentError}`);
   }
 
   return {
@@ -309,8 +376,8 @@ async function executeTask({ repo, issue, state, dryRun }) {
     taskId,
     dryRun: false,
     log: executionLog,
-    reportPath,
-    logPath,
+    reportPath: relativeReportPath,
+    logPath: relativeLogPath,
     validation,
     commit,
   };
