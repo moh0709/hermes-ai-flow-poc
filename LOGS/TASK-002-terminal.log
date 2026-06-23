@@ -1,90 +1,27 @@
-== npm test ==
+Repo: moh0709/hermes-ai-flow-poc
+Issue: #1 TASK-002: Build GitHub Issues polling worker and task queue
+Task ID: TASK-002
 
-> hermes-ai-flow-poc@1.0.0 test
-> vitest run
+Instruction source:
+## Mission
+Build the minimal autonomous task-discovery layer for Hermes AI using GitHub Issues polling. This is the POC step for proving that Hermes can find new tasks from ChatGPT/PM and execute them autonomously.
 
+## Objectives
+1. Implement a lightweight poller that checks GitHub Issues every 60 seconds.
+2. Detect tasks by labels: `pm:ready` and `hermes:ready`.
+3. Prevent duplicate execution using `.hermes/state.json`.
+4. Track task lifecycle states and write logs/reports consistently.
+5. Keep the solution simple and resource-efficient for the POC.
 
- RUN  v3.2.6 /root/.hermes/projects/hermes-ai-flow-poc
+## Acceptance Criteria
+- Poller can discover ready issues from GitHub.
+- Poller ignores already completed tasks.
+- A task lock/state mechanism prevents concurrent duplicate runs.
+- Execution writes terminal logs and result reports in the repo.
+- The system is documented well enough for Phase 2 follow-up work.
 
- ✓ tests/task-queue.test.js (5 tests) 10ms
- ✓ tests/app.test.js (2 tests) 63ms
-
- Test Files  2 passed (2)
-      Tests  7 passed (7)
-   Start at  19:59:13
-   Duration  2.71s (transform 138ms, setup 0ms, collect 1.94s, tests 73ms, environment 1ms, prepare 538ms)
-
-== npm run lint ==
-
-> hermes-ai-flow-poc@1.0.0 lint
-> eslint src tests scripts
-
-== poller dry run ==
-
-> hermes-ai-flow-poc@1.0.0 poll:tasks
-> node scripts/task-poller.mjs --json
-
-{
-  "found": true,
-  "action": "claimable",
-  "repo": "moh0709/hermes-ai-flow-poc",
-  "task_id": "TASK-002",
-  "issue": {
-    "number": 1,
-    "title": "TASK-002: Build GitHub Issues polling worker and task queue",
-    "url": "https://github.com/moh0709/hermes-ai-flow-poc/issues/1",
-    "labels": [
-      "pm:ready",
-      "hermes:ready"
-    ]
-  },
-  "state": {
-    "current_task_id": "TASK-001",
-    "status": "COMPLETED",
-    "last_started_at": "2026-06-23T19:01:00Z",
-    "last_completed_at": "2026-06-23T19:06:00Z",
-    "last_commit": "4ce445be552432a68a2b114359bba72561bbf6cc",
-    "last_report": "REPORTS/TASK-001-RESULT.md",
-    "task_queue": {
-      "source": "github-issues",
-      "labels": [
-        "pm:ready",
-        "hermes:ready"
-      ],
-      "poll_interval_seconds": 60,
-      "last_polled_at": null,
-      "current_issue_number": null,
-      "current_issue_url": null
-    },
-    "notes": "TASK-001 completed successfully: Express app, tests, lint, logs, report, commit, and push completed. TASK-002 adds GitHub Issues polling with duplicate-prevention state."
-  }
-}
-
-__HERMES_CWD_8e9089d197c8__/root/.hermes/projects/hermes-ai-flow-poc__HERMES_CWD_8e9089d197c8__
-== git status before final commit ==
- M .hermes/state.json
- M LOGS/TASK-002-terminal.log
- M REPORTS/TASK-002-RESULT.md
-== final commit ==
-[main 59ca729] TASK-002: finalize poller state and report
- Committer: root <root@vmi2938167.contaboserver.net>
-Your name and email address were configured automatically based
-on your username and hostname. Please check that they are accurate.
-You can suppress this message by setting them explicitly:
-
-    git config --global user.name "Your Name"
-    git config --global user.email you@example.com
-
-After doing this, you may fix the identity used for this commit with:
-
-    git commit --amend --reset-author
-
- 3 files changed, 15 insertions(+), 10 deletions(-)
-FINAL_COMMIT=59ca72908e894a867f9fff68db5bce5dfd82ac95
-== push ==
-To https://github.com/moh0709/hermes-ai-flow-poc.git
-   43b2829..59ca729  main -> main
-== git log -1 ==
-59ca729 TASK-002: finalize poller state and report
-
-__HERMES_CWD_8e9089d197c8__/root/.hermes/projects/hermes-ai-flow-poc__HERMES_CWD_8e9089d197c8__
+## Notes for Hermes
+- Prefer the simplest reliable implementation.
+- Do not introduce webhook infrastructure yet.
+- If needed, add small helper scripts and/or a cron job entry.
+- Keep all changes compatible with the current POC repository structure.

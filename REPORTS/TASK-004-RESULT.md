@@ -1,0 +1,91 @@
+# TASK-004 Result
+
+- Repo: moh0709/hermes-ai-flow-poc
+- Issue: #3 — TASK-004: Self-detection smoke test without manual Hermes prompt
+- Status: COMPLETED
+- Task ID: TASK-004
+- Current commit: d4a8dcb1f761eb832c0070f917bf32f613ef1463
+
+## Validation
+
+- `npm test` → PASS
+- `npm run lint` → PASS
+
+## Execution log excerpt
+
+```text
+Repo: moh0709/hermes-ai-flow-poc
+Issue: #3 TASK-004: Self-detection smoke test without manual Hermes prompt
+Task ID: TASK-004
+
+Instruction source:
+## Mission
+Prove that Hermes can detect this new GitHub Issue by itself through the worker flow, without Mohammad copying a prompt manually.
+
+## Context
+TASK-003 proved that the worker can execute a claimed issue end-to-end. TASK-004 is intentionally small and safe. The purpose is to test autonomous discovery after ChatGPT creates a new ready issue.
+
+## Objectives
+1. Detect this issue using the existing GitHub Issues worker flow.
+2. Create a small status file at `REPORTS/TASK-004-DETECTION.md`.
+3. The file must state that Hermes detected TASK-004 from GitHub Issues without a manual pasted prompt.
+4. Run validation commands.
+5. Write `LOGS/TASK-004-terminal.log`.
+6. Write `REPORTS/TASK-004-RESULT.md`.
+7. Update `.hermes/state.json`.
+8. Comment back on this issue with result, report path, log path, validation status, and commit hash.
+
+## Required File Content
+Create `REPORTS/TASK-004-DETECTION.md` with this exact heading:
+
+```md
+# TASK-004 Detection Confirmed
+```
+
+Include a short note underneath explaining how the task was discovered.
+
+## Validation Commands
+Run:
+
+```bash
+npm test
+npm run lint
+```
+
+## Acceptance Criteria
+- Hermes detects this issue without Mohammad sending a manual Hermes prompt.
+- `REPORTS/TASK-004-DETECTION.md` exists.
+- `LOGS/TASK-004-terminal.log` exists.
+- `REPORTS/TASK-004-RESULT.md` exists.
+- `.hermes/state.json` shows TASK-004 completion.
+- Tests pass.
+- Lint passes.
+- Hermes comments back on this issue.
+
+## PM Note
+This task is created directly by ChatGPT in GitHub Issues. Do not wait for a separate manual instruction from Mohammad.
+
+$ npm test
+
+
+> hermes-ai-flow-poc@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.6 /root/.hermes/projects/hermes-ai-flow-poc
+
+ ✓ tests/task-queue.test.js (5 tests) 9ms
+ ✓ tests/task-worker.test.js (5 tests) 15ms
+ ✓ tests/app.test.js (2 tests) 77ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  23:59:03
+   Duration  825ms (transform 117ms, setup 0ms, collect 446ms, tests 100ms, environment 1ms, prepare 450ms)
+
+$ npm run lint
+
+
+> hermes-ai-flow-poc@1.0.0 lint
+> eslint src tests scripts
+```

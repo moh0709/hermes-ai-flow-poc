@@ -1,106 +1,130 @@
-# Hermes AI Flow POC
+# Hermes AI Flow Framework
 
-Proof of concept flow between ChatGPT as project manager and Hermes as autonomous execution agent working on a VPS.
+Hermes AI Flow started as a proof-of-concept, and it now serves as a reusable framework for running a ChatGPT PM → GitHub Issues → Hermes execution-agent workflow.
 
-## Goal
+## What this framework is
 
-Prove that Hermes can reliably:
+This repository packages the working parts of a repeatable delivery loop:
 
-1. Pull the repository on the VPS.
-2. Read the repository-level agent instructions.
-3. Read the active task.
-4. Implement requested code changes.
-5. Run validation commands.
-6. Save terminal logs and execution reports.
-7. Commit and push the result to GitHub.
-8. Leave enough evidence for review.
+1. A PM creates and labels work in GitHub Issues.
+2. Hermes polls the queue on a VPS.
+3. Hermes claims one runnable task.
+4. Hermes executes the task, validates the result, and records artifacts.
+5. Hermes reports back with logs, a report, and a Git commit reference.
 
-## Source of truth
+The repository includes the worker scripts, state handling, report conventions, and documentation needed to reuse the pattern in another project.
 
-Hermes must always start by reading these files in this order:
+## When to use it
 
-1. `AGENT.md`
-2. `TASKS/ACTIVE_TASK.md`
-3. The task file referenced inside `TASKS/ACTIVE_TASK.md`
+Use this framework when you want:
 
-## Minimal app run instructions
+- a lightweight PM-to-executor workflow,
+- GitHub Issues as the coordination layer,
+- autonomous VPS execution with audit trails,
+- a reusable pattern for another app such as EverythingAI,
+- clear evidence for task completion, validation, and review.
 
-Install dependencies and run the proof-of-concept app:
+## Architecture flow
+
+```text
+ChatGPT PM
+  → creates issue in GitHub
+  → labels it `pm:ready` and `hermes:ready`
+  → writes acceptance criteria and validation commands
+
+Hermes worker
+  → polls GitHub Issues
+  → claims the next runnable task
+  → executes safe validation commands
+  → writes LOGS/TASK-XXX-terminal.log
+  → writes REPORTS/TASK-XXX-RESULT.md
+  → updates .hermes/state.json
+  → comments on the issue
+  → commits and pushes repository changes
+
+GitHub
+  → stores task queue, labels, comments, commits, and artifacts
+```
+
+## Roles
+
+- **Mohammad Ismail** — Product Owner and final approver.
+- **ChatGPT** — Project manager, architect, task creator, and reviewer.
+- **Hermes AI** — Execution agent on the VPS that discovers issues, executes tasks, validates, commits, and reports.
+- **GitHub** — Coordination layer for issues, labels, comments, commits, logs, and reports.
+
+See [`docs/ROLE_MODEL.md`](docs/ROLE_MODEL.md) for the full role model.
+
+## Quick start
 
 ```bash
 npm install
-npm start
+npm test
+npm run lint
+npm run worker:once -- --json
 ```
 
-The server exposes:
+If you are running this on a VPS with GitHub CLI access, the worker will inspect the issue queue and process the next runnable task.
 
-- `GET /health` → `{ "status": "ok" }`
-- `GET /api/todos` → a sample todo list
+## Setup steps for a new project
 
-## Task polling worker
+1. Choose the target GitHub repository.
+2. Clone the repository on the VPS.
+3. Ensure Hermes and GitHub CLI access are available.
+4. Add the framework files from this repo.
+5. Create the labels:
+   - `pm:ready`
+   - `hermes:ready`
+   - `hermes:working`
+   - `hermes:blocked`
+   - `hermes:done`
+   - `pm:review`
+6. Add `.hermes/state.json` using [`templates/STATE_TEMPLATE.json`](templates/STATE_TEMPLATE.json).
+7. Create a test issue with validation commands.
+8. Run `npm run worker:once` to verify the flow.
+9. Run continuously with `npm run worker:watch` or a cron/systemd schedule.
+10. Verify logs, reports, commit history, and the issue comment.
 
-The Phase 2 POC adds a lightweight GitHub Issues poller for PM-to-Hermes work intake.
+For a complete walkthrough, see [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) and [`docs/HERMES_WORKER_SETUP.md`](docs/HERMES_WORKER_SETUP.md).
 
-### Labels
+## Validation process
 
-Use these labels on GitHub issues:
+The standard validation loop is:
 
-- `pm:ready`
-- `hermes:ready`
+1. implement the task,
+2. run the task's validation commands,
+3. capture the terminal output in `LOGS/TASK-XXX-terminal.log`,
+4. summarize the work in `REPORTS/TASK-XXX-RESULT.md`,
+5. update `.hermes/state.json`,
+6. commit and push the changes.
 
-### Poll manually
+This repository currently uses `npm test` and `npm run lint` as the primary validation commands for TASK-006.
 
-```bash
-npm run poll:tasks
-```
+## Reuse in EverythingAI or another app
 
-To claim the next runnable task and update `.hermes/state.json` atomically:
+To reuse the framework:
 
-```bash
-npm run poll:tasks -- --claim
-```
+1. copy the docs and templates,
+2. configure the issue labels,
+3. create a task issue format that includes acceptance criteria and validation commands,
+4. point Hermes at the new repository,
+5. keep the state file and worker logs in the new repo,
+6. adapt the skill and prompt artifacts for the new project name.
 
-### Execute a claimed task end-to-end
+See [`docs/REUSE_IN_OTHER_PROJECTS.md`](docs/REUSE_IN_OTHER_PROJECTS.md) and [`docs/EVERYTHINGAI_ADOPTION_PLAN.md`](docs/EVERYTHINGAI_ADOPTION_PLAN.md).
 
-Run the worker once to claim the next ready issue, read the issue body as the instruction source, execute the safe validation commands listed in the issue, write logs/reports, update state, and comment back on the issue:
+## Project layout
 
-```bash
-npm run worker:once
-```
+- `src/` — application and worker helpers
+- `scripts/` — polling and worker entry points
+- `tests/` — automated tests
+- `docs/` — framework documentation
+- `templates/` — issue, report, and state templates
+- `skills/` — reusable ChatGPT/Hermes prompts
+- `.hermes/` — runtime state and task tracking
+- `LOGS/` — terminal output captured by workers
+- `REPORTS/` — human-readable task reports
 
-For a continuous loop on a VPS:
+## POC evidence
 
-```bash
-npm run worker:watch
-```
-
-### Cron example
-
-Run every 60 seconds:
-
-```cron
-* * * * * cd /path/to/hermes-ai-flow-poc && /usr/bin/npm run worker:once >> LOGS/task-worker-cron.log 2>&1
-```
-
-### Systemd timer example
-
-- Service: `hermes-task-worker.service`
-- Timer: `hermes-task-worker.timer`
-- Execute `npm run worker:once` on schedule
-
-The worker skips tasks already recorded in `.hermes/state.json` to prevent duplicate execution.
-
-## Expected Hermes loop
-
-```text
-1. git pull
-2. read AGENT.md
-3. read TASKS/ACTIVE_TASK.md
-4. read the referenced task file
-5. execute the task
-6. run validation commands
-7. write LOGS/<TASK-ID>-terminal.log
-8. write REPORTS/<TASK-ID>-RESULT.md
-9. update .hermes/state.json
-10. commit and push changes
-```
+The historical proof-of-concept evidence from TASK-001 through TASK-005 is preserved in `LOGS/` and `REPORTS/` and should not be removed.

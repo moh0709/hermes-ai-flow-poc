@@ -1,0 +1,61 @@
+Repo: moh0709/hermes-ai-flow-poc
+Issue: #4 TASK-005: Autonomous discovery heartbeat test
+Task ID: TASK-005
+
+Instruction source:
+## Mission
+Verify autonomous task discovery continues to function without any manual Hermes interaction.
+
+## Objective
+Create a file named `REPORTS/TASK-005-HEARTBEAT.md` containing:
+
+# TASK-005 Heartbeat
+
+Include:
+- Detection timestamp
+- Issue number
+- Current worker mode
+- One sentence confirming autonomous discovery
+
+## Validation
+Run:
+- npm test
+- npm run lint
+
+## Deliverables
+- REPORTS/TASK-005-HEARTBEAT.md
+- REPORTS/TASK-005-RESULT.md
+- LOGS/TASK-005-terminal.log
+- Updated .hermes/state.json
+- Completion comment on this issue
+
+## PM Note
+This issue was created directly by ChatGPT. No separate manual instruction should be required.
+
+$ npm test
+
+> hermes-ai-flow-poc@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.6 /root/.hermes/projects/hermes-ai-flow-poc
+
+ ✓ tests/task-queue.test.js (5 tests) 10ms
+ ✓ tests/task-worker.test.js (5 tests) 16ms
+ ✓ tests/app.test.js (2 tests) 52ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  00:05:47
+   Duration  2.08s (transform 169ms, setup 0ms, collect 1.49s, tests 78ms, environment 2ms, prepare 524ms)
+
+$ npm run lint
+
+> hermes-ai-flow-poc@1.0.0 lint
+> eslint src tests scripts
+
+Validation summary:
+- Tests passed.
+- Lint passed.
+- Heartbeat artifact written.
+- State/report artifacts updated for TASK-005.

@@ -1,0 +1,32 @@
+{
+  "current_task_id": null,
+  "status": "READY",
+  "last_started_at": null,
+  "last_completed_at": null,
+  "last_failed_at": null,
+  "last_claimed_at": null,
+  "last_commit": null,
+  "last_report": null,
+  "last_validation": null,
+  "last_completed_task_id": null,
+  "last_failed_task_id": null,
+  "task_queue": {
+    "source": "github-issues",
+    "labels": [
+      "pm:ready",
+      "hermes:ready"
+    ],
+    "poll_interval_seconds": 60,
+    "last_polled_at": null,
+    "last_claimed_at": null,
+    "last_started_at": null,
+    "last_completed_at": null,
+    "last_failed_at": null,
+    "current_task_id": null,
+    "current_issue_number": null,
+    "current_issue_url": null,
+    "current_issue_title": null,
+    "current_issue_body": null,
+    "status": "READY"
+  }
+}

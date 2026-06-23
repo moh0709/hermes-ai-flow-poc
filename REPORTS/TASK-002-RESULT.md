@@ -1,42 +1,43 @@
-# TASK-002 Result Report
+# TASK-002 Result
 
-## Status
-Completed successfully.
+- Repo: moh0709/hermes-ai-flow-poc
+- Issue: #1 — TASK-002: Build GitHub Issues polling worker and task queue
+- Status: FAILED
+- Task ID: TASK-002
+- Current commit: d4a8dcb1f761eb832c0070f917bf32f613ef1463
 
-## Objective
-Build the GitHub Issues polling worker and task queue POC so Hermes can detect PM tasks from GitHub with low resource usage and prevent duplicate execution with repo state.
+## Validation
 
-## Files changed
-- `package.json`
-- `README.md`
-- `.hermes/state.json`
-- `src/task-queue.js`
-- `scripts/task-poller.mjs`
-- `tests/task-queue.test.js`
-- `LOGS/TASK-002-terminal.log`
-- `REPORTS/TASK-002-RESULT.md`
+- No validation commands were run.
 
-## Commands executed
-- `npm test`
-- `npm run lint`
-- `npm run poll:tasks -- --json`
+## Execution log excerpt
 
-## Validation results
-- `npm test` passed with 7 tests total
-- `npm run lint` passed
-- Poller dry run found `TASK-002` as claimable from GitHub issue `#1`
+```text
+Repo: moh0709/hermes-ai-flow-poc
+Issue: #1 TASK-002: Build GitHub Issues polling worker and task queue
+Task ID: TASK-002
 
-## Decisions made
-- Chose GitHub Issues polling first, not webhooks, to keep the POC simple and low-cost.
-- Implemented the worker as a small Node script that shells out to `gh` instead of adding a heavier API client dependency.
-- Added pure helper functions so the task queue logic is testable without network access.
-- Added cron/systemd usage notes in the README.
+Instruction source:
+## Mission
+Build the minimal autonomous task-discovery layer for Hermes AI using GitHub Issues polling. This is the POC step for proving that Hermes can find new tasks from ChatGPT/PM and execute them autonomously.
 
-## Issues or blockers
-- None.
+## Objectives
+1. Implement a lightweight poller that checks GitHub Issues every 60 seconds.
+2. Detect tasks by labels: `pm:ready` and `hermes:ready`.
+3. Prevent duplicate execution using `.hermes/state.json`.
+4. Track task lifecycle states and write logs/reports consistently.
+5. Keep the solution simple and resource-efficient for the POC.
 
-## Next recommended step
-Run the poller with `--claim` in the scheduled worker path, then extend the worker to dispatch the actual execution flow for future PM tasks.
+## Acceptance Criteria
+- Poller can discover ready issues from GitHub.
+- Poller ignores already completed tasks.
+- A task lock/state mechanism prevents concurrent duplicate runs.
+- Execution writes terminal logs and result reports in the repo.
+- The system is documented well enough for Phase 2 follow-up work.
 
-## Commit hash
-Recorded in git history after completion.
+## Notes for Hermes
+- Prefer the simplest reliable implementation.
+- Do not introduce webhook infrastructure yet.
+- If needed, add small helper scripts and/or a cron job entry.
+- Keep all changes compatible with the current POC repository structure.
+```
