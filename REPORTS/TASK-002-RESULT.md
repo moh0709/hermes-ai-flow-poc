@@ -39,4 +39,4 @@ Build the GitHub Issues polling worker and task queue POC so Hermes can detect P
 Run the poller with `--claim` in the scheduled worker path, then extend the worker to dispatch the actual execution flow for future PM tasks.
 
 ## Commit hash
-PENDING
+Recorded in git history after completion.
