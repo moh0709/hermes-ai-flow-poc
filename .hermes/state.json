@@ -1,0 +1,9 @@
+{
+  "current_task_id": "TASK-001",
+  "status": "READY",
+  "last_started_at": null,
+  "last_completed_at": null,
+  "last_commit": null,
+  "last_report": null,
+  "notes": "Initial state. Hermes should execute TASK-001."
+}
