@@ -60,19 +60,33 @@ To claim the next runnable task and update `.hermes/state.json` atomically:
 npm run poll:tasks -- --claim
 ```
 
+### Execute a claimed task end-to-end
+
+Run the worker once to claim the next ready issue, read the issue body as the instruction source, execute the safe validation commands listed in the issue, write logs/reports, update state, and comment back on the issue:
+
+```bash
+npm run worker:once
+```
+
+For a continuous loop on a VPS:
+
+```bash
+npm run worker:watch
+```
+
 ### Cron example
 
 Run every 60 seconds:
 
 ```cron
-* * * * * cd /path/to/hermes-ai-flow-poc && /usr/bin/npm run poll:tasks -- --claim >> LOGS/task-poller-cron.log 2>&1
+* * * * * cd /path/to/hermes-ai-flow-poc && /usr/bin/npm run worker:once >> LOGS/task-worker-cron.log 2>&1
 ```
 
 ### Systemd timer example
 
-- Service: `hermes-task-poller.service`
-- Timer: `hermes-task-poller.timer`
-- Execute `npm run poll:tasks -- --claim` on schedule
+- Service: `hermes-task-worker.service`
+- Timer: `hermes-task-worker.timer`
+- Execute `npm run worker:once` on schedule
 
 The worker skips tasks already recorded in `.hermes/state.json` to prevent duplicate execution.
 

@@ -6,7 +6,9 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import {
   buildPollingSummary,
-  defaultTaskQueueState,
+  claimIssue,
+  defaultHermesState,
+  normalizeHermesState,
   selectRunnableIssue,
 } from '../src/task-queue.js';
 
@@ -74,7 +76,7 @@ async function listReadyIssues(repo) {
 
 async function main() {
   const options = parseArgs(process.argv);
-  const state = await loadJson(stateFile, { ...defaultTaskQueueState(), current_task_id: null, status: 'IDLE' });
+  const state = normalizeHermesState(await loadJson(stateFile, defaultHermesState()));
   const repo = await getRepoFullName();
   const issues = await listReadyIssues(repo);
   const runnable = selectRunnableIssue(issues, state);
@@ -91,20 +93,7 @@ async function main() {
   }
 
   if (options.claim) {
-    const claimedState = {
-      ...state,
-      current_task_id: runnable.title.match(/TASK-\d+/i)?.[0].toUpperCase() ?? state.current_task_id,
-      current_issue_number: runnable.number,
-      current_issue_url: runnable.url,
-      status: 'IN_PROGRESS',
-      last_polled_at: new Date().toISOString(),
-    };
-    claimedState.task_queue = {
-      ...(state.task_queue ?? defaultTaskQueueState()),
-      current_issue_number: runnable.number,
-      current_issue_url: runnable.url,
-      last_polled_at: claimedState.last_polled_at,
-    };
+    const claimedState = claimIssue(runnable, state);
     await saveJson(stateFile, claimedState);
     const summary = buildPollingSummary({ issue: runnable, repo, state: claimedState });
     summary.action = 'claimed';

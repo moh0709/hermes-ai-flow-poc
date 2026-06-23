@@ -1,0 +1,101 @@
+# TASK-003 Result
+
+- Repo: moh0709/hermes-ai-flow-poc
+- Issue: #2 — TASK-003: Execute claimed GitHub Issue tasks end-to-end
+- Status: COMPLETED
+- Task ID: TASK-003
+- Current commit: 5ed68df79ffa57b3c156eefa5755314a0bb3d848
+
+## Validation
+
+- `npm test` → PASS
+- `npm run lint` → PASS
+
+## Execution log excerpt
+
+```text
+Repo: moh0709/hermes-ai-flow-poc
+Issue: #2 TASK-003: Execute claimed GitHub Issue tasks end-to-end
+Task ID: TASK-003
+
+Instruction source:
+## Mission
+Extend the Phase 2 poller so Hermes can move from task discovery to full end-to-end task execution.
+
+## Context
+TASK-002 created a lightweight GitHub Issues poller that can discover and claim issues labeled `pm:ready` and `hermes:ready`. The next step is to prove that Hermes can automatically execute a claimed issue and report back without Mohammad manually transferring instructions.
+
+## Objectives
+1. Extend the polling-worker flow so it can claim a ready issue and dispatch execution for that task.
+2. Add a safe execution wrapper that reads the GitHub issue body as the task instruction source.
+3. Add lifecycle transitions in `.hermes/state.json`: `READY`, `CLAIMED`, `IN_PROGRESS`, `COMPLETED`, `BLOCKED`, `FAILED`.
+4. Prevent duplicate execution of the same issue/task.
+5. Write logs and reports using the task ID.
+6. Comment back on the GitHub issue after completion with the report path, validation result, and commit hash.
+7. Keep the implementation lightweight and suitable for VPS use.
+
+## Required Deliverables
+- Updated poller or new worker script.
+- Clear command for one-shot execution, for example `npm run worker:once` or similar.
+- Optional command for continuous polling if appropriate, for example `npm run worker:watch`.
+- Updated tests for task selection, state transitions, and duplicate prevention.
+- Updated README with exact manual, cron, and/or systemd usage instructions.
+- `LOGS/TASK-003-terminal.log`.
+- `REPORTS/TASK-003-RESULT.md`.
+- Updated `.hermes/state.json`.
+
+## Validation Commands
+Run all relevant commands, including at minimum:
+
+```bash
+npm test
+npm run lint
+```
+
+If a new script is added, run it in a safe dry-run mode first.
+
+## Acceptance Criteria
+- Worker can discover a ready GitHub issue.
+- Worker can claim the issue without duplicate execution.
+- Worker can execute the task instruction flow from the issue body.
+- Worker writes task-specific logs and result report.
+- Worker updates `.hermes/state.json` correctly.
+- Worker comments back on the GitHub issue with completion details.
+- Existing app tests still pass.
+- Lint passes.
+
+## Safety Constraints
+- Do not add webhook infrastructure yet.
+- Do not introduce heavy dependencies unless clearly justified.
+- Do not force-push.
+- Do not rewrite git history.
+- Do not expose secrets or tokens in logs/reports.
+- Keep all implementation inside this repository.
+
+## PM Note
+This task is approved by Mohammad and ChatGPT. The goal is to remove manual communication transfer between ChatGPT and Hermes by using GitHub Issues as the operating channel.
+
+$ npm test
+
+
+> hermes-ai-flow-poc@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.6 /root/.hermes/projects/hermes-ai-flow-poc
+
+ ✓ tests/task-queue.test.js (5 tests) 8ms
+ ✓ tests/task-worker.test.js (5 tests) 15ms
+ ✓ tests/app.test.js (2 tests) 52ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  22:52:04
+   Duration  1.95s (transform 243ms, setup 0ms, collect 1.36s, tests 75ms, environment 1ms, prepare 689ms)
+
+$ npm run lint
+
+
+> hermes-ai-flow-poc@1.0.0 lint
+> eslint src tests scripts
+```
