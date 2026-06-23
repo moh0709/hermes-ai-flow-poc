@@ -52,6 +52,8 @@ describe('task worker helpers', () => {
     expect(completed.last_completed_task_id).toBe('TASK-003');
     expect(completed.last_commit).toBe('abc123');
     expect(completed.last_report).toBe('REPORTS/TASK-003-RESULT.md');
+    expect(completed.completed_task_ids).toContain('TASK-003');
+    expect(completed.completed_issue_numbers).toContain(2);
 
     const failed = failTaskExecution(inProgress, { reason: 'validation failed' });
     expect(failed.status).toBe('FAILED');

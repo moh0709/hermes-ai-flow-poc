@@ -2,44 +2,48 @@
 
 - Repo: moh0709/hermes-ai-flow-poc
 - Issue: #4 — TASK-005: Autonomous discovery heartbeat test
-- Status: COMPLETED
+- Status: FAILED
 - Task ID: TASK-005
-- Current commit: d4a8dcb1f761eb832c0070f917bf32f613ef1463
+- Current commit: 69aed244803a4f0e205daf354c55d105b10ce64f
 
-## Objective
+## Validation
 
+- No validation commands were run.
+
+## Execution log excerpt
+
+```text
+Repo: moh0709/hermes-ai-flow-poc
+Issue: #4 TASK-005: Autonomous discovery heartbeat test
+Task ID: TASK-005
+
+Instruction source:
+## Mission
 Verify autonomous task discovery continues to function without any manual Hermes interaction.
 
-## Files changed
+## Objective
+Create a file named `REPORTS/TASK-005-HEARTBEAT.md` containing:
 
-- REPORTS/TASK-005-HEARTBEAT.md
-- REPORTS/TASK-005-RESULT.md
-- LOGS/TASK-005-terminal.log
-- .hermes/state.json
+# TASK-005 Heartbeat
 
-## Commands executed
+Include:
+- Detection timestamp
+- Issue number
+- Current worker mode
+- One sentence confirming autonomous discovery
 
-- npm run worker:once -- --json
+## Validation
+Run:
 - npm test
 - npm run lint
 
-## Validation results
+## Deliverables
+- REPORTS/TASK-005-HEARTBEAT.md
+- REPORTS/TASK-005-RESULT.md
+- LOGS/TASK-005-terminal.log
+- Updated .hermes/state.json
+- Completion comment on this issue
 
-- `npm test` passed: 3 test files, 12 tests total.
-- `npm run lint` passed with no errors.
-- The worker did discover a runnable issue, but its automatic validation parser could not extract commands from the issue body, so the heartbeat task was completed manually with explicit validation.
-
-## Decisions made
-
-- Preserved the existing issue queue evidence and worker artifacts.
-- Added the heartbeat file requested by the issue to prove autonomous discovery.
-- Documented the framework so the repository is reusable beyond the original POC.
-
-## Issues or blockers
-
-- The worker-selected issue body did not provide a fenced validation command block, so the worker could not complete the task end-to-end on its own.
-- This was recoverable because the required validation commands were known and could be executed directly.
-
-## Next recommended step
-
-- Re-run `npm run worker:once -- --json` so the worker can move on to the next runnable PM-issued task now that TASK-005 is represented in the repo artifacts.
+## PM Note
+This issue was created directly by ChatGPT. No separate manual instruction should be required.
+```

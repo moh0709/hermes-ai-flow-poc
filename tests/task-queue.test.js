@@ -43,7 +43,7 @@ describe('task queue helpers', () => {
       updatedAt: '2026-06-23T00:00:00Z',
       labels: [{ name: 'pm:ready' }, { name: 'hermes:ready' }],
     };
-    const state = { current_task_id: 'TASK-002', last_completed_task_id: 'TASK-001' };
+    const state = { current_task_id: 'TASK-002', last_completed_task_id: 'TASK-001', completed_task_ids: ['TASK-001'], completed_issue_numbers: [1] };
 
     expect(issueIsRunnable(issue, state)).toBe(false);
   });

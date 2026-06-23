@@ -4,7 +4,7 @@
 - Issue: #1 — TASK-002: Build GitHub Issues polling worker and task queue
 - Status: FAILED
 - Task ID: TASK-002
-- Current commit: d4a8dcb1f761eb832c0070f917bf32f613ef1463
+- Current commit: 69aed244803a4f0e205daf354c55d105b10ce64f
 
 ## Validation
 

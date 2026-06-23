@@ -197,6 +197,13 @@ async function commentOnIssue(repo, issueNumber, body) {
   });
 }
 
+async function closeIssue(repo, issueNumber) {
+  await execFileAsync('gh', ['issue', 'close', '-R', repo, String(issueNumber)], {
+    cwd: repoRoot,
+    maxBuffer: 1024 * 1024,
+  });
+}
+
 async function getCommitHash() {
   const { stdout } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
     cwd: repoRoot,
@@ -289,6 +296,9 @@ async function executeTask({ repo, issue, state, dryRun }) {
         'Commit: `' + commit + '`',
       ].join('\n')
     );
+    if (validationPassed) {
+      await closeIssue(repo, issue.number);
+    }
   } catch (commentError) {
     console.error(`Issue comment failed for ${taskId}: ${commentError?.message ?? commentError}`);
   }

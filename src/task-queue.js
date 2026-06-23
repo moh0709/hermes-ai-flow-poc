@@ -59,6 +59,8 @@ export function defaultTaskQueueState() {
     current_issue_url: null,
     current_issue_title: null,
     current_issue_body: null,
+    completed_task_ids: [],
+    completed_issue_numbers: [],
     status: 'READY',
   };
 }
@@ -76,8 +78,46 @@ export function defaultHermesState() {
     last_validation: null,
     last_completed_task_id: null,
     last_failed_task_id: null,
+    completed_task_ids: [],
+    completed_issue_numbers: [],
     task_queue: defaultTaskQueueState(),
   };
+}
+
+function normalizeUniqueTaskIdList(values = []) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  const seen = new Set();
+  const normalized = [];
+  for (const value of values) {
+    const taskId = normalizeTaskId(value);
+    if (taskId && !seen.has(taskId)) {
+      seen.add(taskId);
+      normalized.push(taskId);
+    }
+  }
+
+  return normalized;
+}
+
+function normalizeUniqueIssueNumberList(values = []) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  const seen = new Set();
+  const normalized = [];
+  for (const value of values) {
+    const number = Number.parseInt(value, 10);
+    if (Number.isInteger(number) && number > 0 && !seen.has(number)) {
+      seen.add(number);
+      normalized.push(number);
+    }
+  }
+
+  return normalized;
 }
 
 export function normalizeTaskQueueState(state = {}) {
@@ -93,6 +133,8 @@ export function normalizeTaskQueueState(state = {}) {
     last_completed_at: normalizeDate(queue.last_completed_at),
     last_failed_at: normalizeDate(queue.last_failed_at),
     current_task_id: normalizeTaskId(queue.current_task_id),
+    completed_task_ids: normalizeUniqueTaskIdList(queue.completed_task_ids),
+    completed_issue_numbers: normalizeUniqueIssueNumberList(queue.completed_issue_numbers),
     status: upperOrNull(queue.status) ?? 'READY',
   };
 }
@@ -114,6 +156,8 @@ export function normalizeHermesState(state = {}) {
     last_validation: state.last_validation ?? null,
     last_completed_task_id: normalizeTaskId(state.last_completed_task_id),
     last_failed_task_id: normalizeTaskId(state.last_failed_task_id),
+    completed_task_ids: normalizeUniqueTaskIdList(state.completed_task_ids ?? queue.completed_task_ids),
+    completed_issue_numbers: normalizeUniqueIssueNumberList(state.completed_issue_numbers ?? queue.completed_issue_numbers),
     task_queue: queue,
   };
 }
@@ -134,6 +178,8 @@ export function issueIsRunnable(issue, state = {}) {
   const lastFailedTaskId = normalizeTaskId(queueState.last_failed_task_id);
   const currentIssueNumber = queueState.task_queue.current_issue_number;
   const currentIssueStatus = upperOrNull(queueState.status) ?? 'READY';
+  const completedTaskIds = new Set(queueState.completed_task_ids ?? []);
+  const completedIssueNumbers = new Set(queueState.completed_issue_numbers ?? []);
 
   if (currentIssueStatus === 'CLAIMED' || currentIssueStatus === 'IN_PROGRESS') {
     if (currentIssueNumber === issue.number || currentTaskId === taskId) {
@@ -141,7 +187,13 @@ export function issueIsRunnable(issue, state = {}) {
     }
   }
 
-  return taskId !== currentTaskId && taskId !== lastCompletedTaskId && taskId !== lastFailedTaskId;
+  return (
+    taskId !== currentTaskId &&
+    taskId !== lastCompletedTaskId &&
+    taskId !== lastFailedTaskId &&
+    !completedTaskIds.has(taskId) &&
+    !completedIssueNumbers.has(issue.number)
+  );
 }
 
 export function selectRunnableIssue(issues, state = {}) {
@@ -199,6 +251,14 @@ export function startTaskExecution(state = {}) {
 export function completeTaskExecution(state = {}, { commit = null, report = null, validation = null } = {}) {
   const queueState = normalizeHermesState(state);
   const now = new Date().toISOString();
+  const completedTaskIds = normalizeUniqueTaskIdList([
+    ...(queueState.completed_task_ids ?? []),
+    queueState.current_task_id,
+  ]);
+  const completedIssueNumbers = normalizeUniqueIssueNumberList([
+    ...(queueState.completed_issue_numbers ?? []),
+    queueState.task_queue.current_issue_number,
+  ]);
   return {
     ...queueState,
     status: 'COMPLETED',
@@ -207,11 +267,15 @@ export function completeTaskExecution(state = {}, { commit = null, report = null
     last_commit: commit,
     last_report: report,
     last_validation: validation,
+    completed_task_ids: completedTaskIds,
+    completed_issue_numbers: completedIssueNumbers,
     task_queue: {
       ...queueState.task_queue,
       status: 'COMPLETED',
       last_completed_at: now,
       last_polled_at: now,
+      completed_task_ids: completedTaskIds,
+      completed_issue_numbers: completedIssueNumbers,
     },
   };
 }
@@ -304,22 +368,30 @@ export function buildExecutionSummary({ issue, repo, state, validation = null, r
 
 export function extractValidationCommands(body = '') {
   const text = String(body);
-  const validationHeader = /^##\s+Validation Commands\s*$/im;
+  const validationHeader = /^##\s+Validation(?:\s+Commands)?\s*$/im;
   const headerMatch = validationHeader.exec(text);
   if (!headerMatch) {
     return [];
   }
 
   const afterHeader = text.slice(headerMatch.index + headerMatch[0].length);
-  const fencedMatch = afterHeader.match(/```(?:bash|sh|shell)?\s*\n([\s\S]*?)```/i);
-  if (!fencedMatch) {
-    return [];
+  const nextHeaderMatch = afterHeader.match(/\n##\s+/);
+  const section = nextHeaderMatch ? afterHeader.slice(0, nextHeaderMatch.index) : afterHeader;
+
+  const fencedMatch = section.match(/```(?:bash|sh|shell)?\s*\n([\s\S]*?)```/i);
+  if (fencedMatch) {
+    return fencedMatch[1]
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && !line.startsWith('#'));
   }
 
-  return fencedMatch[1]
+  return section
     .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter((line) => line.length > 0 && !line.startsWith('#'));
+    .map((line) => line.replace(/^[-*]\s+/, ''))
+    .map((line) => line.replace(/^\d+[.)]\s+/, ''))
+    .filter((line) => line.length > 0 && !/^run:\s*$/i.test(line) && !line.startsWith('#'));
 }
 
 export function isSafeTaskCommand(command) {
